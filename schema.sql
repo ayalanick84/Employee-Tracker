@@ -16,7 +16,7 @@ CREATE TABLE role (
      PRIMARY KEY (position)
 
 )
-CREATE TABLE department (
+CREATE TABLE employee (
      position INT NOT NULL,
      first_name VARCHAR(30),
      last_name VARCHAR(30),
