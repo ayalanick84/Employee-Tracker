@@ -40,7 +40,7 @@ const nextAction = () => {
                     VIEW_DEP,
                     VIEW_EMP,
                     VIEW_ROLE,
-                    UPDATE,
+                    UPDATE_EMP,
                     "EXIT"
                 ]
             }
@@ -65,7 +65,7 @@ const nextAction = () => {
                 case VIEW_ROLE:
                     return viewRole();
 
-                case UPDATE:
+                case UPDATE_EMP:
                     return updateEmp();
 
                 default:
@@ -77,9 +77,7 @@ const nextAction = () => {
             process.exit(1);
         });
 };
-// const deps = [];
-// const roles = [];
-// const employees = [];
+
 function addDep() {
     return inquirer
         .prompt([
@@ -164,8 +162,9 @@ function addEmp() {
                 value: row.position,
             }
         });
+        const query = "SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS manager, employee.position FROM employee"
         connection.query(
-            "SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS manager, employee.position FROM employee",
+            query,
             (err, results) => {
                 if (err) {
                     throw err;
@@ -175,8 +174,8 @@ function addEmp() {
                         name: row.manager,
                         value: row.id
                     };
+                    managers.push("They have no manager")
                 });
-                managers.push("They have no manager")
                 // once you have the items, prompt the user for which they'd like to bid on
                 return inquirer
                     .prompt([
@@ -217,4 +216,70 @@ function addEmp() {
             })
     })
 }
-
+function viewDep() {
+    return connection.query("SELECT * FROM department", (err, results) => {
+        if (err) {
+            throw err;
+        }
+        for (var i = 0; i < results.length; i++) {
+            console.log("Department Name: " + results[i].dep_name);
+        }
+        return nextAction();
+    })
+}
+function viewRole() {
+    return connection.query("SELECT * FROM role", (err, results) => {
+        if (err) {
+            throw err;
+        }
+        for (var i = 0; i < results.length; i++) {
+            console.log("Role: " + results[i].name + " || Salary: " + results[i].salary);
+        }
+        return nextAction();
+    })
+}
+function viewEmp() {
+    return connection.query("SELECT * FROM employee", (err, results) => {
+        if (err) {
+            throw err;
+        }
+        for (var i = 0; i < results.length; i++) {
+            console.log(" Employee Name: " + results[i].first_name + results[i].last_name);
+        }
+        return nextAction();
+    })
+}
+function updateEmp() {
+    return connection.query("SELECT * FROM role", (err, results) => {
+        if (err) {
+            throw err;
+        }
+        const roleNames = results.map((row) => {
+            return {
+                name: row.title,
+                value: row.position,
+            }
+        });
+        return inquirer
+            .prompt([
+                {
+                    name: "newRole",
+                    type: "list",
+                    choices: roleNames,
+                    message: "What is their new role?",
+                }])
+                .then((answers) => {
+                    return connection.query(
+                        "INSERT INTO employee (role_id,manager_id,first_name,last_name) VALUES ( ?,?, ?, ?)",
+                        [answers.role, , answers.manager, answers.firstName, answers.lastName],
+                        function (err, res) {
+                            if (err) {
+                                throw err;
+                            }
+                            console.log("Success");
+                            // re-prompt the user for if they want to bid or post
+                            return nextAction();
+                        })
+                })
+})
+}
