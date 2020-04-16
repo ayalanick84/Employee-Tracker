@@ -268,10 +268,9 @@ function updateEmp() {
                     choices: roleNames,
                     message: "What is their new role?",
                 }])
-                .then((answers) => {
-                    return connection.query(
-                        "INSERT INTO employee (role_id,manager_id,first_name,last_name) VALUES ( ?,?, ?, ?)",
-                        [answers.role, , answers.manager, answers.firstName, answers.lastName],
+            .then((answers) => {
+                return connection.query(
+                    connection.query("UPDATE employee SET", [answers.newRole],
                         function (err, res) {
                             if (err) {
                                 throw err;
@@ -280,6 +279,6 @@ function updateEmp() {
                             // re-prompt the user for if they want to bid or post
                             return nextAction();
                         })
-                })
-})
+            )})
+    })
 }
