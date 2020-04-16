@@ -24,7 +24,7 @@ const nextAction = () => {
     const VIEW_DEP = "View departments";
     const VIEW_ROLE = "View roles";
     const VIEW_EMP = "View employees";
-    const UPDATE = "Update employee roles"
+    const UPDATE_EMP = "Update employee roles"
 
 
     return inquirer
